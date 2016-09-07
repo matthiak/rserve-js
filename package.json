@@ -1,7 +1,7 @@
 {
-  "name": "rserve-js",
-  "version": "0.0.6",
-  "description": "Rserve client in JavaScript",
+  "name": "rserve-js-v1",
+  "version": "1.0.0",
+  "description": "Rserve client in JavaScript with support for large arrays",
   "keywords": [
     "R",
     "Rserve"
@@ -41,10 +41,20 @@
     "karma-simple-browserify-preprocessor": "0.0.2",
     "mocha": "^2.4.5"
   },
-  "author": "Koichiro Sobue (https://github.com/ksobue/)",
+  "author": "Matthias Klapperstueck <matthias.klapperstueck@monash.edu> (https://github.com/matthiak/)",
+  "contributors" : [
+	{
+		"name": "Tobias Czauderna",
+		"email": "tobias.czauderna@monash.edu"
+	},
+	{
+		"name": "Koichiro Sobue",
+		"url": "https://github.com/ksobue/"
+	}
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ksobue/rserve-js.git"
+    "url": "https://github.com/matthiak/rserve-js.git"
   },
   "license": "MIT"
 }

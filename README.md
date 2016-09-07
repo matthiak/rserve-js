@@ -1,15 +1,18 @@
-# rserve-js 
-[![Build Status](https://travis-ci.org/ksobue/rserve-js.svg)](https://travis-ci.org/ksobue/rserve-js) [![npm version](https://badge.fury.io/js/rserve-js.svg)](https://badge.fury.io/js/rserve-js) [![Coverage Status](https://coveralls.io/repos/github/ksobue/rserve-js/badge.svg?branch=master)](https://coveralls.io/github/ksobue/rserve-js?branch=master) [![Dependency Status](https://david-dm.org/ksobue/rserve-js.svg)](https://david-dm.org/ksobue/rserve-js) [![devDependency Status](https://david-dm.org/ksobue/rserve-js/dev-status.svg)](https://david-dm.org/ksobue/rserve-js#info=devDependencies)
+# rserve-js-v1
 
 RServe client in JavaScript
 
 This node module will communicate with R/Rserve over TCP/IP socket, allowing user to evaluate R statements from JavaScript and get the result as JavaScript object.
 
+It is based on this project: https://github.com/matthiak/rserve-js
+
+But changes were made to properly support large dataarrays (larger 16 megabytes).
+
 ## Installation
-    $ npm install rserve-js
+    $ npm install rserve-js-v1
   
 # Usage
-    let Rserve = require("rserve-js");
+    let Rserve = require("rserve-js-v1");
     
     let client = Rserve.connect("localhost", 6311, function() {
         console.log("Connected to Rserve.");
