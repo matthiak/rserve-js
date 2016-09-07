@@ -1,6 +1,6 @@
 {
   "name": "rserve-js-v1",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Rserve client in JavaScript with support for large arrays",
   "keywords": [
     "R",
@@ -42,15 +42,15 @@
     "mocha": "^2.4.5"
   },
   "author": "Matthias Klapperstueck <matthias.klapperstueck@monash.edu> (https://github.com/matthiak/)",
-  "contributors" : [
-	{
-		"name": "Tobias Czauderna",
-		"email": "tobias.czauderna@monash.edu"
-	},
-	{
-		"name": "Koichiro Sobue",
-		"url": "https://github.com/ksobue/"
-	}
+  "contributors": [
+    {
+      "name": "Tobias Czauderna",
+      "email": "tobias.czauderna@monash.edu"
+    },
+    {
+      "name": "Koichiro Sobue",
+      "url": "https://github.com/ksobue/"
+    }
   ],
   "repository": {
     "type": "git",
