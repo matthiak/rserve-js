@@ -131,7 +131,7 @@ function encodeMessage(msg) {
 		let type = data.type;
 		
 		let headersize;
-		if( length > Math.pow(2,24) - 1) {
+		if( length <= Math.pow(2,24) - 1) {
 			headersize = 4;
 			
 		} else {
@@ -153,7 +153,7 @@ function encodeMessage(msg) {
 				type = header[0]
 				length = header[1..7], with header[1] = 0 and header[2..7] = length intel byte order
 			*/
-			headerBuffer.writeUInt32LE(length, 2, 6);
+			headerBuffer.writeUInt32LE(length, 1, 6);
 		
         
         buffers.unshift(headerBuffer);
@@ -392,7 +392,7 @@ function encodeMessage(msg) {
 			let type = expr.type;
 			
 			let headersize;
-			if( length > Math.pow(2,24) - 1) {
+			if( length <= Math.pow(2,24) - 1) {
 				headersize = 4;
 				
 			} else {
@@ -418,7 +418,7 @@ function encodeMessage(msg) {
 					type = header[0]
 					length = header[1..7], with header[1] = 0 and header[2..7] = length intel byte order
 				*/
-                headerBuffer.writeUInt32LE(length, 2, 6);
+                headerBuffer.writeUInt32LE(length, 1, 6);
             
 			buffers.unshift(headerBuffer);
 
