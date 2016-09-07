@@ -4,7 +4,7 @@ RServe client in JavaScript
 
 This node module will communicate with R/Rserve over TCP/IP socket, allowing user to evaluate R statements from JavaScript and get the result as JavaScript object.
 
-It is based on this project: https://github.com/matthiak/rserve-js
+It is based on this project: https://github.com/ksobue/rserve-js
 
 But changes were made to properly support large dataarrays (larger 16 megabytes).
 
