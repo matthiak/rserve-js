@@ -30,20 +30,20 @@ function encodeMessage(msg) {
         let buffer = encodeData(param);
         buffers.push(buffer);
     });
-    
+	
     let length = buffers.length;
     let length_0_31 = length;
     let length_32_63 = 0;
-    if (length > Math.pow(2, 32)) {
-        length_0_31 = length - Math.pow(2, 32);
-        length_32_63 = parseInt(length / Math.pow(2, 32));
+    if (length > Math.pow(2, 32) - 1) {
+		length_0_31 = buffers.length % Math.pow(2, 32);
+		length_32_63 = (buffers.length - length) / Math.pow(2, 32);
     }
     
     let headerBuffer = new Buffer(16);
     headerBuffer.writeInt32LE(msg.command, 0);
-    headerBuffer.writeInt32LE(length_0_31, 4);
+    headerBuffer.writeUInt32LE(length_0_31, 4);
     headerBuffer.writeInt32LE(msg.id || 0, 8);
-    headerBuffer.writeInt32LE(length_32_63, 12);
+    headerBuffer.writeUInt32LE(length_32_63, 12);
     buffers.unshift(headerBuffer);
     
     return buffers.toBuffer();
@@ -101,7 +101,7 @@ function encodeMessage(msg) {
                 let arr = data.value;
                 let n = arr.length;
                 let buffer = new Buffer(4);
-                buffer.writeInt32LE(n, 0);
+                buffer.writeUInt32LE(n, 0);
                 buffers.push(buffer);
                 for (let i = 0; i < n; i++) {
                     let data = arr[i];
@@ -127,24 +127,35 @@ function encodeMessage(msg) {
             buffers.push(pad);
         }
         
-        let length = buffers.length;
-        let length2 = 0;
-        if (length > Math.pow(2, 24)) {
-            length = parseInt(length / Math.pow(2, 24));
-            length2 = length - Math.pow(2, 24);
-        }
+		let length = buffers.length;
+		let type = data.type;
+		
+		let headersize;
+		if( length > Math.pow(2,24) - 1) {
+			headersize = 4;
+			
+		} else {
+			headersize = 8;
+			type |= _.DT_LARGE;
+		}
+
+		let headerBuffer = new Buffer(headersize);
+		headerBuffer.writeUInt8(type , 0);
+		if(headersize == 4)
+			headerBuffer.writeUIntLE(length, 1, 3);
+		else
+			/*
+				if header size is 8, the first byte is the type
+				and the remaining 7 the size.
+				We only support 6byte sizes due to the javascript
+				large number limitations
+				header = 8 byte;
+				type = header[0]
+				length = header[1..7], with header[1] = 0 and header[2..7] = length intel byte order
+			*/
+			headerBuffer.writeUInt32LE(length, 2, 6);
+		
         
-        let type = data.type;
-        if (length2 > 0) {
-            type |= _.DT_LARGE;
-        }
-        
-        let headerBuffer = new Buffer(length2 === 0 ? 4 : 8);
-        headerBuffer.writeUInt8(type, 0);
-        headerBuffer.writeIntLE(length, 1, 3);
-        if (length2 !== 0) {
-            headerBuffer.writeInt32LE(length2, 4);
-        }
         buffers.unshift(headerBuffer);
         
         return buffers.toBuffer();
@@ -272,11 +283,15 @@ function encodeMessage(msg) {
                 {
                     let arr = expr.value;
                     let buffer = new Buffer(8 * arr.length);
-                    for (let i = 0; i < arr.length; i++) {
+					for (let i = 0; i < arr.length; i++) {
                         let val = arr[i];
                         
                         if (val !== null) {
-                            buffer.writeDoubleLE(val, 8 * i);
+							try {
+								buffer.writeDoubleLE(val, 8 * i);
+							} catch (err) {
+								console.log('Error writing buffer at idx = ' + i);
+							}
                         } else {
                             DOUBLE_NA.copy(buffer, 8 * i);
                         }
@@ -318,7 +333,7 @@ function encodeMessage(msg) {
                 {
                     let arr = expr.value;
                     let buffer = new Buffer(4 + 1 * arr.length);
-                    buffer.writeInt32LE(arr.length, 0);
+                    buffer.writeUInt32LE(arr.length, 0);
                     for (let i = 0; i < arr.length; i++) {
                         let val = arr[i];
                         buffer.writeInt8(bool(val), 4 + 1 * i);
@@ -330,7 +345,7 @@ function encodeMessage(msg) {
                 {
                     let raw = expr.value;
                     let buffer = new Buffer(4 + raw.length);
-                    buffer.writeInt32LE(raw.length, 0);
+                    buffer.writeUInt32LE(raw.length, 0);
                     raw.copy(buffer, 4);
                     buffers.push(buffer);
                 }
@@ -374,28 +389,39 @@ function encodeMessage(msg) {
             }
             
             let length = buffers.length;
-            let length2 = 0;
-            if (length > Math.pow(2, 24)) {
-                length = parseInt(length / Math.pow(2, 24));
-                length2 = length - Math.pow(2, 24);
-            }
-            
-            let type = expr.type;
-            if (length2 > 0) {
-                type |= _.XT_LARGE;
-            }
+			let type = expr.type;
+			
+			let headersize;
+			if( length > Math.pow(2,24) - 1) {
+				headersize = 4;
+				
+			} else {
+				headersize = 8;
+				type |= _.XT_LARGE;
+			}
+
             if (expr.attr !== undefined) {
                 type |= _.XT_HAS_ATTR;
             }
             
-            let headerBuffer = new Buffer(length2 === 0 ? 4 : 8);
+            let headerBuffer = new Buffer(headersize);
             headerBuffer.writeUInt8(type , 0);
-            headerBuffer.writeIntLE(length, 1, 3);
-            if (length2 !== 0) {
-                headerBuffer.writeInt32LE(length2, 4);
-            }
-            buffers.unshift(headerBuffer);
+			if(headersize == 4)
+				headerBuffer.writeUIntLE(length, 1, 3);
+            else
+				/*
+					if header size is 8, the first byte is the type
+					and the remaining 7 the size.
+					We only support 6byte sizes due to the javascript
+					large number limitations
+					header = 8 byte;
+					type = header[0]
+					length = header[1..7], with header[1] = 0 and header[2..7] = length intel byte order
+				*/
+                headerBuffer.writeUInt32LE(length, 2, 6);
             
+			buffers.unshift(headerBuffer);
+
             return buffers.toBuffer();
         }
     }
