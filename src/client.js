@@ -18,6 +18,7 @@ const simplifySEXP = require("./util").simplifySEXP;
 class RserveClient extends EventEmitter {
     
     constructor(url, connectListener) {
+		
         super();
         
         this.on("connect", connectListener);
@@ -55,6 +56,7 @@ class RserveClient extends EventEmitter {
         });
         
         this.sendMessage = function(req, cb) {
+		
             let writeBuffer = encodeMessage(req);
             client.write(writeBuffer);
             
@@ -417,6 +419,7 @@ class RserveClient extends EventEmitter {
     }
 
     setSEXP(name, sexp, cb) {
+		
         this.sendMessage({
             command: _.CMD_setSEXP,
             params: [
@@ -441,6 +444,7 @@ class RserveClient extends EventEmitter {
     }
 
     assignSEXP(name, sexp, cb) {
+		
         this.sendMessage({
             command: _.CMD_assignSEXP,
             params: [

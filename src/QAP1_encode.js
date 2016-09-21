@@ -141,9 +141,10 @@ function encodeMessage(msg) {
 
 		let headerBuffer = new Buffer(headersize);
 		headerBuffer.writeUInt8(type , 0);
-		if(headersize == 4)
+		if(headersize == 4)  {
 			headerBuffer.writeUIntLE(length, 1, 3);
-		else
+		}
+		else {
 			/*
 				if header size is 8, the first byte is the type
 				and the remaining 7 the size.
@@ -153,8 +154,8 @@ function encodeMessage(msg) {
 				type = header[0]
 				length = header[1..7], with header[1] = 0 and header[2..7] = length intel byte order
 			*/
-			headerBuffer.writeUInt32LE(length, 1, 6);
-		
+			headerBuffer.writeUIntLE(length, 1, 6);
+		}
         
         buffers.unshift(headerBuffer);
         
@@ -165,6 +166,7 @@ function encodeMessage(msg) {
             let buffers = new Buffers();
             
             if (_.HAS_ATTR(expr.type)) {
+			
                 let buffer = encodeSEXP(expr.attr);
                 buffers.push(buffer);
             }
@@ -253,6 +255,7 @@ function encodeMessage(msg) {
             case _.XT_LIST_TAG:
             case _.XT_LANG_TAG:
                 {
+					
                     let listTag = expr.value;
                     for (let i = 0; i < listTag.length; i += 2) {
                         let val = listTag[i];
@@ -281,6 +284,7 @@ function encodeMessage(msg) {
                 break;
             case _.XT_ARRAY_DOUBLE:
                 {
+
                     let arr = expr.value;
                     let buffer = new Buffer(8 * arr.length);
 					for (let i = 0; i < arr.length; i++) {
@@ -403,7 +407,7 @@ function encodeMessage(msg) {
             if (expr.attr !== undefined) {
                 type |= _.XT_HAS_ATTR;
             }
-            
+			
             let headerBuffer = new Buffer(headersize);
             headerBuffer.writeUInt8(type , 0);
 			if(headersize == 4)
@@ -418,10 +422,10 @@ function encodeMessage(msg) {
 					type = header[0]
 					length = header[1..7], with header[1] = 0 and header[2..7] = length intel byte order
 				*/
-                headerBuffer.writeUInt32LE(length, 1, 6);
+                headerBuffer.writeUIntLE(length, 1, 6);
             
 			buffers.unshift(headerBuffer);
-
+			
             return buffers.toBuffer();
         }
     }

@@ -26,13 +26,13 @@ const STR_NA = new Buffer([0xff, 0x00]);
 function decodeMessage(buffer) {
     let pos = 0;
     
-    let command = buffer.readInt32LE(pos);
+    let command = buffer.readUInt32LE(pos);
     pos += 4;
-    let length_0_31 = buffer.readInt32LE(pos);
+    let length_0_31 = buffer.readUInt32LE(pos);
     pos += 4;
-    let messageId = buffer.readInt32LE(pos);
+    let messageId = buffer.readUInt32LE(pos);
     pos += 4;
-    let length_32_63 = buffer.readInt32LE(pos);
+    let length_32_63 = buffer.readUInt32LE(pos);
     pos += 4;
     
     let length = length_32_63 * Math.pow(2, 32) + length_0_31;
@@ -58,14 +58,22 @@ function decodeMessage(buffer) {
         
         let type = buffer.readUInt8(pos + 0);
         pos += 1;
-        let length = buffer.readIntLE(pos, 3);
-        pos += 3;
+        let length;
+        
         
         if (_.IS_LARGE(type)) {
-            let length2 = buffer.readInt32LE(pos);
-            pos += 4;
-            length += length2 * Math.pow(2, 24);
-        }
+//            let length2 = buffer.readInt32LE(pos);
+//            pos += 4;
+//            length += length2 * Math.pow(2, 24);
+			
+			length = buffer.readUIntLE(pos, 6);
+			pos += 7;
+		} else {
+			length = buffer.readUIntLE(pos, 3);
+			pos += 3;
+
+		}
+
         
         switch (_.GET_DT(type)) {
         case _.DT_INT:
@@ -121,14 +129,20 @@ function decodeMessage(buffer) {
             
             let type = buffer.readUInt8(pos);
             pos += 1;
-            let length = buffer.readIntLE(pos, 3);
-            pos += 3;
+			
+            let length;
             
             if (_.IS_LARGE(type)) {
-                let length2 = buffer.readInt32LE(pos);
-                pos += 4;
-                length += length2 * Math.pow(2, 24);
-            }
+			    //let length2 = buffer.readInt32LE(pos);
+                //pos += 4;
+                //length += length2 * Math.pow(2, 24);
+				length = buffer.readUIntLE(pos, 6);
+				pos += 7;
+            } else {
+				length = buffer.readUIntLE(pos, 3);
+				pos += 3;
+
+			}
             
             let eoa = pos + length;
             
@@ -185,6 +199,7 @@ function decodeMessage(buffer) {
             case _.XT_LANG_NOTAG:
             case _.XT_VECTOR_EXP:
             case _.XT_VECTOR_STR:
+				
                 {
                     value = [];
                     while (pos < eoa) {
